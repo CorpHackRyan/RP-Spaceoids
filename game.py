@@ -41,12 +41,13 @@ class SpaceRocks:
 
 
 
-        # debug test object
+        # debug test object for control test
         self.debug_obj = SpaceObject()
         self.debug_obj.centerx, new_rock.centery = self.max_screen_x/2, self.max_screen_y/2
         self.debug_obj.dtheta = 0
         self.debug_obj.create_rotation_map()
         self.space_objects.add(self.debug_obj)
+        self.debug_obj.debug = True
 
 
 
@@ -93,9 +94,9 @@ class SpaceRocks:
             sys.exit()  # finally, let's kill everything that's left
 
         # debug controls test
+
         if event.type == pygame.KEYUP:
-            self.debug_obj.dy = 0
-            self.debug_obj.dx = 0
+            pass
         elif event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_LEFT:
@@ -106,8 +107,8 @@ class SpaceRocks:
 
             if event.key == pygame.K_UP:
                 theta = radians(self.debug_obj.theta - 90)  # the degrees start at different places with pygame
-                self.debug_obj.dx += 1*cos(theta)
-                self.debug_obj.dy += 1*sin(theta)
+                self.debug_obj.dx += cos(theta)
+                self.debug_obj.dy += sin(theta)
 
     def _process_game_logic(self):
         # start with processing the simple physics

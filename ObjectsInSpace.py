@@ -1,6 +1,5 @@
 import pygame.image
 from pygame.sprite import Sprite
-from math import pi
 
 
 class SpaceObject(Sprite):
@@ -17,7 +16,6 @@ class SpaceObject(Sprite):
         # the default image
         self.image = pygame.image.load("images/player.png").convert_alpha()
         self.rect = self.image.get_rect()
-
 
         # physical stats of the object
         self.mass = 1  # mass of the object, useful for momentum calculation
@@ -41,11 +39,14 @@ class SpaceObject(Sprite):
 
         self.rotation_mapping = {}
 
+        # debug flag
+        self.debug = False
+
     def create_rotation_map(self):
         # make a hash table of all the rotations
         # I did this because rotating every time was ponderously slow
         # this let me load all the angles into a dictionary
-        for angle in range(-15,380):
+        for angle in range(-15, 380):
             # it's a little more than 360 degrees because rounding errors can cause a key error
             orig_image = self.image.copy()
             rotated_image = pygame.transform.rotozoom(orig_image, angle, 1)
@@ -75,6 +76,9 @@ class SpaceObject(Sprite):
             self.rect.centerx += self.dx
             self.rect.centery += self.dy
 
+        if self.debug:
+            print(self.rect, self.theta, self.dx, self.dy)
+
 
 class SpaceBoulder(SpaceObject):
     # the actual physical asteroid sprites go here
@@ -92,10 +96,12 @@ class SpaceBoulder(SpaceObject):
         # you have to do this to initialize the sprite
         pygame.sprite.Sprite.__init__(self)
 
+
 class Player(SpaceObject):
     # the player sprites go in here
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)  # you have to do this to initialize the sprite
+
 
 class Bullet(SpaceObject):
     # bullet sprites go here
