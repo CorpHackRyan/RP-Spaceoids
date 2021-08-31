@@ -4,6 +4,7 @@ from random import randint, random, choice
 from ObjectsInSpace import *
 from math import sin, cos, degrees, radians
 
+
 class SpaceRocks:
     def __init__(self):
         # initialize Pygame
@@ -30,27 +31,22 @@ class SpaceRocks:
             new_rock = SpaceBoulder()
             new_rock.centerx = randint(0, self.max_screen_x)
             new_rock.centery = randint(0, self.max_screen_y)
-            new_rock.dx = randint(-3,3)
-            new_rock.dy = randint(-3,3)
-            new_rock.theta = randint(0,360)
-            new_rock.dtheta = random()*choice([1,-1])  # degrees per second
+            new_rock.dx = randint(-3, 3)
+            new_rock.dy = randint(-3, 3)
+            new_rock.theta = randint(0, 360)
+            new_rock.dtheta = random()*choice([1, -1])  # degrees per second
             new_rock.create_rotation_map()
 
             # do more later
             self.space_objects.add(new_rock)
 
-
-
         # debug test object for control test
         self.debug_obj = SpaceObject()
-        self.debug_obj.centerx, new_rock.centery = self.max_screen_x/2, self.max_screen_y/2
+        self.debug_obj.centerx, self.debug_obj.centery = self.max_screen_x/2, self.max_screen_y/2
         self.debug_obj.dtheta = 0
         self.debug_obj.create_rotation_map()
         self.space_objects.add(self.debug_obj)
         self.debug_obj.debug = True
-
-
-
 
         # menu instantiation here?
         # my intuition is that for something simple like this, maybe we should have
@@ -100,10 +96,10 @@ class SpaceRocks:
         elif event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_LEFT:
-                self.debug_obj.dtheta+= 1
+                self.debug_obj.dtheta += 1
 
             if event.key == pygame.K_RIGHT:
-                self.debug_obj.dtheta-= 1
+                self.debug_obj.dtheta -= 1
 
             if event.key == pygame.K_UP:
                 theta = radians(self.debug_obj.theta - 90)  # the degrees start at different places with pygame
@@ -113,7 +109,6 @@ class SpaceRocks:
     def _process_game_logic(self):
         # start with processing the simple physics
         for obj in self.space_objects:
-
 
             # let's warm the object back around if it goes outside the screen
             if obj.rect.centerx > (self.max_screen_x + obj.rect.width):
