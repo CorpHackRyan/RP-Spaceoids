@@ -2,7 +2,7 @@ import sys
 import pygame
 from random import randint, random, choice
 from ObjectsInSpace import *
-from math import sin, cos, degrees, radians
+from math import sin, cos, radians, sqrt
 
 
 class SpaceRocks:
@@ -46,7 +46,7 @@ class SpaceRocks:
         self.debug_obj.dtheta = 0
         self.debug_obj.create_rotation_map()
         self.space_objects.add(self.debug_obj)
-        self.debug_obj.debug = True
+        self.debug_obj.thruster_rate = 5
 
         # menu instantiation here?
         # my intuition is that for something simple like this, maybe we should have
@@ -90,21 +90,39 @@ class SpaceRocks:
             sys.exit()  # finally, let's kill everything that's left
 
         # debug controls test
-
+        # this works by toggling the thruster rate on or off
         if event.type == pygame.KEYUP:
-            pass
+            self.debug_obj.dtheta = 0
         elif event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_LEFT:
-                self.debug_obj.dtheta += 1
+                self.debug_obj.dtheta = self.debug_obj.thruster_rate
 
             if event.key == pygame.K_RIGHT:
-                self.debug_obj.dtheta -= 1
+                self.debug_obj.dtheta = -self.debug_obj.thruster_rate
 
             if event.key == pygame.K_UP:
-                theta = radians(self.debug_obj.theta - 90)  # the degrees start at different places with pygame
-                self.debug_obj.dx += cos(theta)
-                self.debug_obj.dy += sin(theta)
+                # this works by getting the current angle theta from the heading of the ship
+                theta = radians(self.debug_obj.theta)
+                # now figure out what the sum of the current speed and the thrust will give you
+                new_dx = self.debug_obj.dx + cos(theta)*self.debug_obj.thruster_rate
+                new_dy = self.debug_obj.dy - sin(theta)*self.debug_obj.thruster_rate
+
+                # if that doesn't exceed the max speed then go ahead and add to speed
+                if sqrt(new_dx**2 + new_dy**2) < self.debug_obj.max_speed:
+                    self.debug_obj.dx += cos(theta)*self.debug_obj.thruster_rate
+                    self.debug_obj.dy += -sin(theta)*self.debug_obj.thruster_rate
+
+            if event.key == pygame.K_DOWN:
+                # if you hold down the "down key" the ship should rotate around to face retrograde
+                track = self.debug_obj.get_track()
+                heading = self.debug_obj.theta
+                difference = heading - track
+                if abs(difference) > 5:
+                    print(difference)
+                    self.debug_obj.dtheta = -self.debug_obj.thruster_rate
+
+                print(heading)
 
     def _process_game_logic(self):
         # start with processing the simple physics

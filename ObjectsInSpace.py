@@ -1,5 +1,6 @@
 import pygame.image
 from pygame.sprite import Sprite
+from math import atan2, degrees
 
 
 class SpaceObject(Sprite):
@@ -14,7 +15,9 @@ class SpaceObject(Sprite):
         super().__init__()
 
         # the default image
-        self.image = pygame.image.load("images/player.png").convert_alpha()
+        # you must rotate all the images so they face to the right
+        # you can do this by loading the image in rotated - load the image, convert alpha, then rotate it -90 degrees
+        self.image = pygame.transform.rotate(pygame.image.load("images/player.png").convert_alpha(), -90)
         self.rect = self.image.get_rect()
 
         # physical stats of the object
@@ -30,6 +33,8 @@ class SpaceObject(Sprite):
         self.dx = 0
         self.dy = 0
         self.dtheta = 0
+        self.thruster_rate = 0  # this will determine how fast a particular object can rotate by default
+        self.max_speed = 10  # in pixels per second
 
         # default health
         self.health = 100
@@ -51,6 +56,15 @@ class SpaceObject(Sprite):
             orig_image = self.image.copy()
             rotated_image = pygame.transform.rotozoom(orig_image, angle, 1)
             self.rotation_mapping[angle] = rotated_image
+
+    def get_track(self):
+        dy = self.dy
+        dx = self.dx
+
+        if dx == 0:
+            return self.theta
+        else:
+            return degrees(atan2(dy,dx))
 
     def update(self):
         # this gets updated when you update a sprite or group of sprites
