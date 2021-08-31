@@ -1,9 +1,8 @@
 import sys
 import pygame
-from random import randint, random
+from random import randint, random, choice
 from ObjectsInSpace import *
-from math import pi
-
+from math import sin, cos, degrees, radians
 
 class SpaceRocks:
     def __init__(self):
@@ -27,16 +26,28 @@ class SpaceRocks:
 
         print("Initializing Objects!")
         # let's initialize the objects, let's make them random
-        for i in range(randint(3,10)):
+        for i in range(10):
             new_rock = SpaceBoulder()
             new_rock.centerx = randint(0, self.max_screen_x)
             new_rock.centery = randint(0, self.max_screen_y)
             new_rock.dx = randint(-3,3)
             new_rock.dy = randint(-3,3)
-            new_rock.dtheta = 2*pi*random()/10000  # radians per second
+            new_rock.theta = randint(0,360)
+            new_rock.dtheta = random()*choice([1,-1])  # degrees per second
+            new_rock.create_rotation_map()
 
             # do more later
             self.space_objects.add(new_rock)
+
+
+
+        # debug test object
+        self.debug_obj = SpaceObject()
+        self.debug_obj.centerx, new_rock.centery = self.max_screen_x/2, self.max_screen_y/2
+        self.debug_obj.dtheta = 0
+        self.debug_obj.create_rotation_map()
+        self.space_objects.add(self.debug_obj)
+
 
 
 
@@ -81,16 +92,27 @@ class SpaceRocks:
             pygame.quit()
             sys.exit()  # finally, let's kill everything that's left
 
+        # debug controls test
+        if event.type == pygame.KEYUP:
+            self.debug_obj.dy = 0
+            self.debug_obj.dx = 0
+        elif event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_LEFT:
+                self.debug_obj.dtheta+= 1
+
+            if event.key == pygame.K_RIGHT:
+                self.debug_obj.dtheta-= 1
+
+            if event.key == pygame.K_UP:
+                theta = radians(self.debug_obj.theta - 90)  # the degrees start at different places with pygame
+                self.debug_obj.dx += 1*cos(theta)
+                self.debug_obj.dy += 1*sin(theta)
+
     def _process_game_logic(self):
         # start with processing the simple physics
         for obj in self.space_objects:
-            # movement for the objects
-            obj.rect.centerx += obj.dx
-            obj.rect.centery += obj.dy
 
-            # rotation of the object
-            obj.theta += obj.dtheta
-            obj.image = pygame.transform.rotate(obj.image, obj.dtheta)
 
             # let's warm the object back around if it goes outside the screen
             if obj.rect.centerx > (self.max_screen_x + obj.rect.width):
