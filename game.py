@@ -41,12 +41,12 @@ class SpaceRocks:
             self.space_objects.add(new_rock)
 
         # debug test object for control test
-        self.debug_obj = SpaceObject()
-        self.debug_obj.centerx, self.debug_obj.centery = self.max_screen_x/2, self.max_screen_y/2
-        self.debug_obj.dtheta = 0
-        self.debug_obj.create_rotation_map()
-        self.space_objects.add(self.debug_obj)
-        self.debug_obj.thruster_rate = 5
+        self.player_ship = Player()
+        self.player_ship.centerx, self.player_ship.centery = self.max_screen_x/2, self.max_screen_y/2
+        self.player_ship.dtheta = 0
+        self.player_ship.create_rotation_map()
+        self.player_ship.is_controllable = True
+        self.space_objects.add(self.player_ship)
 
         # menu instantiation here?
         # my intuition is that for something simple like this, maybe we should have
@@ -89,43 +89,32 @@ class SpaceRocks:
             pygame.quit()
             sys.exit()  # finally, let's kill everything that's left
 
-        # debug controls test
-        # this works by toggling the thruster rate on or off
-        if event.type == pygame.KEYUP:
-            self.debug_obj.dtheta = 0
-        elif event.type == pygame.KEYDOWN:
-
-            if event.key == pygame.K_LEFT:
-                self.debug_obj.dtheta = self.debug_obj.thruster_rate
-
-            if event.key == pygame.K_RIGHT:
-                self.debug_obj.dtheta = -self.debug_obj.thruster_rate
-
-            if event.key == pygame.K_UP:
-                # this works by getting the current angle theta from the heading of the ship
-                theta = radians(self.debug_obj.theta)
-                # now figure out what the sum of the current speed and the thrust will give you
-                new_dx = self.debug_obj.dx + cos(theta)*self.debug_obj.thruster_rate
-                new_dy = self.debug_obj.dy - sin(theta)*self.debug_obj.thruster_rate
-
-                # if that doesn't exceed the max speed then go ahead and add to speed
-                if sqrt(new_dx**2 + new_dy**2) < self.debug_obj.max_speed:
-                    self.debug_obj.dx += cos(theta)*self.debug_obj.thruster_rate
-                    self.debug_obj.dy += -sin(theta)*self.debug_obj.thruster_rate
-
-            if event.key == pygame.K_DOWN:
-                # if you hold down the "down key" the ship should rotate around to face retrograde
-                track = self.debug_obj.get_track()
-                heading = self.debug_obj.theta
-                difference = heading - track
-                if abs(difference) > 5:
-                    print(difference)
-                    self.debug_obj.dtheta = -self.debug_obj.thruster_rate
-
-                print(heading)
+        # control of the sprites works by turning off or on sprites' thrusters
+        sprites = [sprite for sprite in self.space_objects if sprite.is_controllable]
+        # a list of all the sprites that are player controllable
+        for sprite in sprites:
+            if event.type == pygame.KEYUP:
+                # when you let up on the keys, the rotation stops
+                sprite.stop_rotation()
+            elif event.type == pygame.KEYDOWN:
+                # when you push a key, let's turn thrusters on or off
+                if event.key == pygame.K_LEFT:
+                    sprite.rotate_left()
+                elif event.key == pygame.K_RIGHT:
+                    sprite.rotate_right()
+                elif event.key == pygame.K_UP:
+                    sprite.accelerate()
+                elif event.key == pygame.K_DOWN:
+                    sprite.decelerate()
+                elif event.key == pygame.K_SPACE:
+                    bullet = sprite.fire()
+                    bullet.create_rotation_map()
+                    self.space_objects.add(bullet)
 
     def _process_game_logic(self):
         # start with processing the simple physics
+        # delete object list
+        delete_list = []
         for obj in self.space_objects:
 
             # let's warm the object back around if it goes outside the screen
@@ -140,6 +129,15 @@ class SpaceRocks:
 
             if obj.rect.centery < -obj.rect.height:
                 obj.rect.centery = self.max_screen_y + obj.rect.height
+
+            if isinstance(obj,Bullet):
+                if obj.range <= 0:
+                    delete_list.append(obj)
+
+        # now delete all the stuff that should be deleted
+        for obj in delete_list:
+            self.space_objects.remove(obj)
+
 
     def _draw(self):
         background_color = (0, 0, 255)

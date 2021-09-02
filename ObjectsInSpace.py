@@ -1,6 +1,6 @@
 import pygame.image
 from pygame.sprite import Sprite
-from math import atan2, degrees
+from math import atan2, degrees, radians, sin, cos, sqrt
 
 
 class SpaceObject(Sprite):
@@ -23,8 +23,9 @@ class SpaceObject(Sprite):
         # physical stats of the object
         self.mass = 1  # mass of the object, useful for momentum calculation
 
-        # the position variables will eventually be handled some other way
-        self.theta = 0  # angle theta of the sprite
+        # the position variables may eventually be handled some other way
+        self.theta = 0  # angle theta of the sprite, basically the heading
+
 
         # these are the values for velocity
         # we'll figure out how to properly scale these later, but at first glance
@@ -47,6 +48,11 @@ class SpaceObject(Sprite):
         # debug flag
         self.debug = False
 
+        # controllable flags
+        self.is_controllable = False
+        self.network_controllable = False
+        self.AI_controllable = False
+
     def create_rotation_map(self):
         # make a hash table of all the rotations
         # I did this because rotating every time was ponderously slow
@@ -57,14 +63,48 @@ class SpaceObject(Sprite):
             rotated_image = pygame.transform.rotozoom(orig_image, angle, 1)
             self.rotation_mapping[angle] = rotated_image
 
-    def get_track(self):
-        dy = self.dy
-        dx = self.dx
+    def stop_rotation(self):
+        self.dtheta = 0
 
-        if dx == 0:
-            return self.theta
-        else:
-            return degrees(atan2(dy,dx))
+    def rotate_right(self):
+        self.dtheta = -self.thruster_rate
+
+    def rotate_left(self):
+        self.dtheta = self.thruster_rate
+
+    def accelerate(self):
+        # this works by getting the current angle theta from the heading of the ship
+        theta = radians(self.theta)
+        # now figure out what the sum of the current speed and the thrust will give you
+        new_dx = self.dx + cos(theta) * self.thruster_rate
+        new_dy = self.dy - sin(theta) * self.thruster_rate
+
+        # if that doesn't exceed the max speed then go ahead and add to speed
+        if sqrt(new_dx ** 2 + new_dy ** 2) < self.max_speed:
+            self.dx += cos(theta) * self.thruster_rate
+            self.dy += -sin(theta) * self.thruster_rate
+
+    def decelerate(self):
+        # this works by getting the current angle theta from the heading of the ship
+        theta = radians(self.theta)
+        # now figure out what the sum of the current speed and the thrust will give you
+        new_dx = self.dx + cos(theta) * self.thruster_rate
+        new_dy = self.dy - sin(theta) * self.thruster_rate
+
+        # if that doesn't exceed the max speed then go ahead and add to speed
+        if sqrt(new_dx ** 2 + new_dy ** 2) >= 0:
+            self.dx = self.dx * self.thruster_rate/100
+            self.dy = self.dy * self.thruster_rate/100
+
+    def fire(self):
+        # this produces a bullet object with the position and velocity of the sprite in question
+        bullet = Bullet(self.rect, self.dy, self.dx, radians(self.theta))
+        return bullet
+
+    def get_track(self):
+        dx = self.dx
+        dy = self.dy
+        return atan2(-dy, dx)
 
     def update(self):
         # this gets updated when you update a sprite or group of sprites
@@ -114,10 +154,33 @@ class SpaceBoulder(SpaceObject):
 class Player(SpaceObject):
     # the player sprites go in here
     def __init__(self):
+        super().__init__()
+        # load the image from the images folder
+        self.image = pygame.transform.rotate(pygame.image.load("images/player.png").convert_alpha(), -90)
+
+        # create a rectangle from the image
+        self.rect = self.image.get_rect()
+
+        self.thruster_rate = 3
+
         pygame.sprite.Sprite.__init__(self)  # you have to do this to initialize the sprite
 
 
 class Bullet(SpaceObject):
-    # bullet sprites go here
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)  # you have to do this to initialize the sprite
+
+    def __init__(self, rect, dx, dy, theta):
+        super().__init__()  # you have to do this to initialize the Space Object class
+        self.image = pygame.transform.rotate(pygame.image.load("images/laserRed.png").convert_alpha(), -90)
+
+        self.rect = rect
+        self.max_speed = 10
+        self.dx = (dx + self.max_speed)*cos(theta)
+        self.dy = (dy + -self.max_speed)*sin(theta)
+        self.range = 20  # counter range
+
+        pygame.sprite.Sprite.__init__(self)
+
+    def update(self):
+        super().update()
+
+        self.range = self.range -1
