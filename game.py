@@ -29,10 +29,31 @@ class SpaceRocks:
         # and score is the score!
         self.score = 0
         self.alive = True
+        self.results = "Game Over"  # the main loop will return this variable when the game is complete
 
         # menu instantiation here?
         # my intuition is that for something simple like this, maybe we should have
         # any menu stuff handled in the instantiation of the class?  I don't know - TBD.
+        # Update on 9/2 - I think menus should be outside the SpaceRocks class - PP
+
+        # text default stuff
+        # we need a font for Pygame, change your fonts here
+        self.font = pygame.font.Font('freesansbold.ttf', 32)
+
+        # let's set up the text box for the health readout
+        self.health_readout = self.font.render('Health: 100%', True, (255 , 0, 0), (255, 255, 255))
+        self.health_readout_rect = self.health_readout.get_rect()
+        self.health_readout_rect.centery = self.max_screen_y - self.health_readout_rect.height
+        self.health_readout_rect.centerx = self.health_readout_rect.width
+
+        # let's set up a text box for your score
+        # this is basically duplicate code from above, but the names and colors are slightly different
+        # not exactly DRY, but writing a function to generate this for only a few things seems like more
+        # work than just making a score readout
+        self.score_readout = self.font.render('Score: 0', True, (0, 255, 0), (255, 255, 255))
+        self.score_readout_rect = self.score_readout.get_rect()
+        self.score_readout_rect.centery = self.max_screen_y - self.score_readout_rect.height
+        self.score_readout_rect.centerx = self.max_screen_x - self.score_readout_rect.width
 
     def __del__(self):
         # when the object is deleted, kill Pygame
@@ -54,6 +75,8 @@ class SpaceRocks:
 
             # now tick the clock forward
             self.clock.tick(60)
+
+        return self.results
 
     def _process_events(self, event):
         # pygame events processed here
@@ -143,6 +166,7 @@ class SpaceRocks:
 
                     # let's add the score here
                     self.score += 100
+                    self.score_readout = self.font.render(f'Score: {self.score}', True, (0, 255, 0), (255, 255, 255))
                     delete_list.append(obj)  # now get rid of the laser
 
             # now do boulder logic here
@@ -165,10 +189,8 @@ class SpaceRocks:
             # now we'll do player logic here
             if isinstance(obj, Player):
                 if obj.health <= 0:
-                    # death stuff goes here
-                    print("You're DEAD!")
-                    print("Score: ", self.score)
                     self.alive = False
+                    self.results = f"You have died.  Game Over.  Final Score: {self.score}"
 
                 # check to see if the player ship has collided with the rocks
                 collision = pygame.sprite.spritecollide(obj, rock_group, False, pygame.sprite.collide_mask)
@@ -179,6 +201,9 @@ class SpaceRocks:
                         spark = Spark(obj.rect)
                         spark.create_rotation_map()
                         add_list.append(spark)
+
+                    # when the rock hits the ship, let's update the health
+                    self.health_readout = self.font.render(f'Health: {obj.health}%', True, (255, 0, 0), (255, 255, 255))
 
             # Now we'll work with the RockDebris logic and spark logic
             # now we'll clean up sprites if they're out of range
@@ -203,5 +228,11 @@ class SpaceRocks:
         # now let's update and draw all the sprites
         self.space_objects.update()
         self.space_objects.draw(self.screen)
+
+        # now let's draw the player health and score
+        # later if there ends up being a lot more data displayed on the screen
+        # we could abstract this some, but for now, this will be sufficient. -pp
+        self.screen.blit(self.health_readout, self.health_readout_rect)
+        self.screen.blit(self.score_readout, self.score_readout_rect)
 
         pygame.display.flip()

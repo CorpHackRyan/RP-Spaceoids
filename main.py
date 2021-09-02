@@ -38,4 +38,4 @@ player_ship.is_controllable = True
 game.space_objects.add(player_ship)  # finally add it to the space_objects
 
 # run the game loop
-game.main_loop()
+print(game.main_loop())
