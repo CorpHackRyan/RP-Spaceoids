@@ -1,6 +1,9 @@
+import random
+
 import pygame.image
 from pygame.sprite import Sprite
 from math import atan2, degrees, radians, sin, cos, sqrt
+from random import choice
 
 
 class SpaceObject(Sprite):
@@ -25,7 +28,6 @@ class SpaceObject(Sprite):
 
         # the position variables may eventually be handled some other way
         self.theta = 0  # angle theta of the sprite, basically the heading
-
 
         # these are the values for velocity
         # we'll figure out how to properly scale these later, but at first glance
@@ -166,6 +168,53 @@ class Player(SpaceObject):
         pygame.sprite.Sprite.__init__(self)  # you have to do this to initialize the sprite
 
 
+class RockDebris(SpaceObject):
+
+    def __init__(self, rect):
+        # when a laser hits a rock, make some rock debris sprites that list a little bit
+        super().__init__()  # you have to do this to initialize the Space Object class
+        self.image = pygame.transform.rotate(pygame.image.load("images/meteorSmall.png").convert_alpha(), -90)
+        self.rect = rect
+
+        self.dx = choice([-1, 0, 1])
+        self.dy = choice([-1, 0, 1])
+        self.dtheta = choice([-10, -5, 0, 5, 10])
+
+        self.range = 20  # counter range
+
+        pygame.sprite.Sprite.__init__(self)
+
+    def update(self):
+        super().update()
+
+        self.range = self.range - 1
+
+
+class Spark(SpaceObject):
+    # these are "sparks" objects
+    # they're basically the same as RockDebris
+    # but I think it's more readable to just make
+    # a separate object
+    def __init__(self, rect):
+        # when a laser hits a rock, make some rock debris sprites that list a little bit
+        super().__init__()  # you have to do this to initialize the Space Object class
+        self.image = pygame.transform.rotate(pygame.image.load("images/spark.png").convert_alpha(), -90)
+        self.rect = rect
+
+        self.dx = choice([-10, 0, 10])
+        self.dy = choice([-10, 0, 10])
+        self.dtheta = choice([-10, -5, 0, 5, 10])
+
+        self.range = 10  # counter range
+
+        pygame.sprite.Sprite.__init__(self)
+
+    def update(self):
+        super().update()
+
+        self.range = self.range - 1
+
+
 class Bullet(SpaceObject):
 
     def __init__(self, rect, dx, dy, theta):
@@ -176,7 +225,7 @@ class Bullet(SpaceObject):
         self.max_speed = 10
         self.dx = (dx + self.max_speed)*cos(theta)
         self.dy = (dy + -self.max_speed)*sin(theta)
-        self.range = 20  # counter range
+        self.range = 50  # counter range
 
         pygame.sprite.Sprite.__init__(self)
 

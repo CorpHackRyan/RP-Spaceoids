@@ -29,24 +29,35 @@ class SpaceRocks:
         # let's initialize the objects, let's make them random
         for i in range(10):
             new_rock = SpaceBoulder()
-            new_rock.centerx = randint(0, self.max_screen_x)
-            new_rock.centery = randint(0, self.max_screen_y)
+            new_rock.rect.centerx = randint(0, self.max_screen_x)
+            new_rock.rect.centery = randint(0, self.max_screen_y)
             new_rock.dx = randint(-3, 3)
             new_rock.dy = randint(-3, 3)
             new_rock.theta = randint(0, 360)
-            new_rock.dtheta = random()*choice([1, -1])  # degrees per second
+            new_rock.dtheta = choice([1, -1])  # degrees per second
             new_rock.create_rotation_map()
 
             # do more later
             self.space_objects.add(new_rock)
 
         # debug test object for control test
+        # we instantiate a "Player" here, stick them in the middle of the screen
         self.player_ship = Player()
-        self.player_ship.centerx, self.player_ship.centery = self.max_screen_x/2, self.max_screen_y/2
+        self.player_ship.health = 100
+        self.player_ship.rect.centerx = self.max_screen_x/2
+        self.player_ship.rect.centery = self.max_screen_y/2
         self.player_ship.dtheta = 0
         self.player_ship.create_rotation_map()
+        # it's a player ship, so we need to flag the ship as controllable
         self.player_ship.is_controllable = True
-        self.space_objects.add(self.player_ship)
+        self.space_objects.add(self.player_ship)  # finally add it to the space_objects
+
+        # score and gameplay stuff here
+        # obviously we'll adjust this when we add multiplayer
+        # but for now, it's simple, self.alive controls the main while loop
+        # and score is the score!
+        self.score = 0
+        self.alive = True
 
         # menu instantiation here?
         # my intuition is that for something simple like this, maybe we should have
@@ -58,7 +69,7 @@ class SpaceRocks:
 
     def main_loop(self):
 
-        while True:
+        while self.alive:
 
             # get all the events, and process every one
             for event in pygame.event.get():
@@ -90,9 +101,9 @@ class SpaceRocks:
             sys.exit()  # finally, let's kill everything that's left
 
         # control of the sprites works by turning off or on sprites' thrusters
-        sprites = [sprite for sprite in self.space_objects if sprite.is_controllable]
+        controllables = [sprite for sprite in self.space_objects if sprite.is_controllable]
         # a list of all the sprites that are player controllable
-        for sprite in sprites:
+        for sprite in controllables:
             if event.type == pygame.KEYUP:
                 # when you let up on the keys, the rotation stops
                 sprite.stop_rotation()
@@ -114,23 +125,96 @@ class SpaceRocks:
     def _process_game_logic(self):
         # start with processing the simple physics
         # delete object list
-        delete_list = []
+        delete_list = []  # this list of sprites will be deleted at the end of this method
+        add_list = []  # this is list of sprites will be added at the end of this method
+
+        # rock_group is a sprite group that we can do logic on more conveniently
+        # we loop through the "space_objects" and add any SpaceBoulder to the
+        # rock group, we'll use this later to manage collisions
+        # we also create a laser group here to see measure the
+        # damage done to rocks
+        rock_group = pygame.sprite.Group()
+        bullet_group = pygame.sprite.Group()
+        for obj in self.space_objects:
+            if isinstance(obj, SpaceBoulder):
+                rock_group.add(obj)
+            if isinstance(obj, Bullet):
+                bullet_group.add(obj)
+
+        # now iterate through the objects in self.space_objects and perform logic on it
         for obj in self.space_objects:
 
             # let's warm the object back around if it goes outside the screen
+            # all this logic does is warp stuff to the opposite side of the screen
+            # if an object goes too far in one direction.  Effectively the geometry of
+            # this mini universe is toroidal
             if obj.rect.centerx > (self.max_screen_x + obj.rect.width):
                 obj.rect.centerx = -obj.rect.width
-
             if obj.rect.centerx < -obj.rect.width:
                 obj.rect.centerx = self.max_screen_x + obj.rect.width
-
             if obj.rect.centery > (self.max_screen_y + obj.rect.height):
                 obj.rect.centery = -obj.rect.height
-
             if obj.rect.centery < -obj.rect.height:
                 obj.rect.centery = self.max_screen_y + obj.rect.height
 
-            if isinstance(obj,Bullet):
+            # process the bullet logic first
+            if isinstance(obj, Bullet):
+                # let's check for collisions between the rock_group and bullets
+                bullet_hit = pygame.sprite.spritecollide(obj, rock_group, False, pygame.sprite.collide_mask)
+                if bullet_hit:
+                    # if there's a collision between a laser and and rock
+                    # then make a couple of debris rocks
+                    # then add the laser beam to the delete list
+                    for i in range(5):
+                        rock_debris = RockDebris(obj.rect)
+                        rock_debris.create_rotation_map()
+                        add_list.append(rock_debris)  # add this sprites to the list to be added
+
+                    # let's add the score here
+                    self.score += 100
+                    delete_list.append(obj)  # now get rid of the laser
+
+            # now do boulder logic here
+            if isinstance(obj, SpaceBoulder):
+                # if the boulder's health is zero... add it to the delete list
+                if obj.health <= 0:
+                    # if the health of a space boulder gets to zero, let's
+                    # make 4 pieces of debris to fly off
+                    for i in range(4):
+                        rock_debris = RockDebris(obj.rect)
+                        rock_debris.create_rotation_map()
+                        add_list.append(rock_debris)
+
+                    delete_list.append(obj)
+
+                collide = pygame.sprite.spritecollide(obj, bullet_group, True, pygame.sprite.collide_mask)
+                if collide:
+                    obj.health -= 10  # take away 10 HP if a laser hits a rock
+
+            # now we'll do damage logic here
+            if isinstance(obj, Player):
+                if obj.health <= 0:
+                    # death stuff goes here
+                    print("You're DEAD!")
+                    print("Score: ", self.score)
+                    self.alive = False
+
+                # check to see if the player ship has collided with the rocks
+                collision = pygame.sprite.spritecollide(obj, rock_group, False, pygame.sprite.collide_mask)
+                if collision:
+                    # let's make some sparks if the ship collides with rocks
+                    obj.health -= 1
+                    for i in range(4):
+                        spark = Spark(obj.rect)
+                        spark.create_rotation_map()
+                        add_list.append(spark)
+
+            # Now we'll work with the RockDebris logic and spark logic
+            # now we'll clean up sprites if they're out of range
+            is_ranged = isinstance(obj, RockDebris) or isinstance(obj, Spark) or isinstance(obj, Bullet)
+            if is_ranged:
+                # rock debris is short lived, like bullets that don't do any damage
+                # they disappear after a little bit, so do sparks, and bullets
                 if obj.range <= 0:
                     delete_list.append(obj)
 
@@ -138,6 +222,8 @@ class SpaceRocks:
         for obj in delete_list:
             self.space_objects.remove(obj)
 
+        for obj in add_list:
+            self.space_objects.add(obj)
 
     def _draw(self):
         background_color = (0, 0, 255)
