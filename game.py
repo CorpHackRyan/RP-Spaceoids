@@ -25,32 +25,7 @@ class SpaceRocks:
         # sprite Group
         self.space_objects = pygame.sprite.Group()
 
-        print("Initializing Objects!")
-        # let's initialize the objects, let's make them random
-        for i in range(10):
-            new_rock = SpaceBoulder()
-            new_rock.rect.centerx = randint(0, self.max_screen_x)
-            new_rock.rect.centery = randint(0, self.max_screen_y)
-            new_rock.dx = randint(-3, 3)
-            new_rock.dy = randint(-3, 3)
-            new_rock.theta = randint(0, 360)
-            new_rock.dtheta = choice([1, -1])  # degrees per second
-            new_rock.create_rotation_map()
 
-            # do more later
-            self.space_objects.add(new_rock)
-
-        # debug test object for control test
-        # we instantiate a "Player" here, stick them in the middle of the screen
-        self.player_ship = Player()
-        self.player_ship.health = 100
-        self.player_ship.rect.centerx = self.max_screen_x/2
-        self.player_ship.rect.centery = self.max_screen_y/2
-        self.player_ship.dtheta = 0
-        self.player_ship.create_rotation_map()
-        # it's a player ship, so we need to flag the ship as controllable
-        self.player_ship.is_controllable = True
-        self.space_objects.add(self.player_ship)  # finally add it to the space_objects
 
         # score and gameplay stuff here
         # obviously we'll adjust this when we add multiplayer
@@ -191,7 +166,7 @@ class SpaceRocks:
                 if collide:
                     obj.health -= 10  # take away 10 HP if a laser hits a rock
 
-            # now we'll do damage logic here
+            # now we'll do player logic here
             if isinstance(obj, Player):
                 if obj.health <= 0:
                     # death stuff goes here

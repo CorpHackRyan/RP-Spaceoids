@@ -6,3 +6,4 @@ Largely this is just a vehicle for us to learn Git better, and tinker with Pygam
 
 8/30: Ryan fixed some formatting errors. Also, just testing to push back to master. 
 
+9/2 Pat got the basic functionality of single player running.
