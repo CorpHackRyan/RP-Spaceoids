@@ -1,3 +1,6 @@
+# Ryan and Pat's Spaceoids
+# a comically terrible asteroids clone
+
 from game import SpaceRocks
 from ObjectsInSpace import *
 from random import randint, choice
@@ -7,6 +10,9 @@ game = SpaceRocks()
 
 print("Loading Objects!")
 # let's initialize the objects to be used in the game object
+# we can instantiate boulders however we want in a game
+# to start we do it randomly and add some random rotation, etc.
+# 9/2 - pat
 for i in range(10):
     new_rock = SpaceBoulder()
     new_rock.rect.centerx = randint(0, game.max_screen_x)
@@ -22,6 +28,7 @@ for i in range(10):
 # we instantiate a "Player" here, stick them in the middle of the screen
 player_ship = Player()
 player_ship.health = 100
+# let's place the player in the middle of the game screen
 player_ship.rect.centerx = game.max_screen_x / 2
 player_ship.rect.centery = game.max_screen_y / 2
 player_ship.dtheta = 0
@@ -30,5 +37,5 @@ player_ship.create_rotation_map()
 player_ship.is_controllable = True
 game.space_objects.add(player_ship)  # finally add it to the space_objects
 
-
+# run the game loop
 game.main_loop()

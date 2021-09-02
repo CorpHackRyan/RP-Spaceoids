@@ -1,8 +1,6 @@
-import random
-
 import pygame.image
 from pygame.sprite import Sprite
-from math import atan2, degrees, radians, sin, cos, sqrt
+from math import atan2, radians, sin, cos, sqrt
 from random import choice
 
 
@@ -11,7 +9,7 @@ class SpaceObject(Sprite):
     # and they all inherit from the Sprite class
     def __init__(self):
         # we define the basic physical location and properties of a space object during
-        # instantiation, a space object can have a postion, a angle theta, a velocity
+        # instantiation, a space object can have a position, a angle theta, a velocity
         # causes a certain amount of collision damage, has a health, etc.
 
         # first, let's get all the stuff from the parent class
@@ -40,6 +38,7 @@ class SpaceObject(Sprite):
         self.max_speed = 10  # in pixels per second
 
         # default health
+        self.max_health = 100
         self.health = 100
 
         # default damage that is experienced when colliding with it
@@ -146,9 +145,6 @@ class SpaceBoulder(SpaceObject):
         # load the image from the images folder
         self.image = pygame.image.load("images/meteorBig.png").convert_alpha()
 
-        # these have a big mass
-        self.mass = 1000
-
         # create a rectangle from the image
         self.rect = self.image.get_rect()
 
@@ -235,4 +231,4 @@ class Bullet(SpaceObject):
     def update(self):
         super().update()
 
-        self.range = self.range -1
+        self.range = self.range - 1

@@ -1,8 +1,6 @@
 import sys
 import pygame
-from random import randint, random, choice
 from ObjectsInSpace import *
-from math import sin, cos, radians, sqrt
 
 
 class SpaceRocks:
@@ -24,8 +22,6 @@ class SpaceRocks:
 
         # sprite Group
         self.space_objects = pygame.sprite.Group()
-
-
 
         # score and gameplay stuff here
         # obviously we'll adjust this when we add multiplayer
@@ -50,7 +46,7 @@ class SpaceRocks:
             for event in pygame.event.get():
                 self._process_events(event)
 
-            # sprite colision, physics stuff, etc can go in this function
+            # sprite collision, physics stuff, etc can go in this function
             self._process_game_logic()
 
             # draw the scene on the screen
