@@ -146,7 +146,7 @@ class SpaceBoulder(SpaceObject):
         # load the image from the images folder
         self.image = pygame.image.load("images/meteorBig.png").convert_alpha()
 
-        #these have a big mass
+        # these have a big mass
         self.mass = 1000
 
         # create a rectangle from the image
