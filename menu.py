@@ -15,7 +15,7 @@ class Choice:
     def __str__(self):
         # if you try to use it as a string, or use the str() function
         # it returns the text as well as the text of the function
-        return self.text + str(self.function)
+        return self.text + " " + str(self.function)
 
     def __eq__(self, other):
         # this compares the function that you're looking at with another function
@@ -23,11 +23,31 @@ class Choice:
         return self.function == other
 
 
+class Button:
+    # button objects are similar to Choices however they
+    # execute a function when clicked
+
+    def __init__(self, text="Button", function=lambda: None):
+        # the default text is "button" and just like the other one, the function is a lambda
+        # function that returns None
+        self.text = text
+        self.function = function
+
+    def __eq__(self, other):
+        # checks to see if the actiion_functions are the same
+        return self.function == other
+
+    def __str__(self):
+        # returns the button text and the function as a string
+        return self.text + " " + str(self.function)
+
+
 class Menu:
     # instances of this menu work like this
     # you instantiate a menu
     # you set some of the instances variables that control the behavior of the menu
-    # populate it with choice objects
+    # there's a list you can populate it with choice objects
+    # there's a list you can populate with button objects
     # run the function "create_menu_map()" to create all the appropriate graphics
     # then, after it's configured, you run the "main_loop()" function
     # the main_loop() function returns the selected function from the menu
@@ -37,14 +57,15 @@ class Menu:
         pygame.init()
         self.font = pygame.font.Font('freesansbold.ttf', 32)  # the default font if you decide to keep that
         self.text_color = (255, 0, 0)  # defaults to RED
-        self.text_color_selected (0, 255, 0) # defaults to GREEN
+        self.text_color_selected = (0, 255, 0) # defaults to GREEN
         self.background_color = (0, 0, 0)  # defaults to BLACK
         self.background_color_selected = (255, 255, 255) # defaults to WHITE
 
-        self.menu_active = False  # this has to be turned on for the main_loop() function to loop
+        self.menu_active = True  # this has to be turned on for the main_loop() function to loop
         self.menu_title = "Menu"
         self.choices = []  # a list of the menu choices that are available
-        self.current_selected = None
+        self.buttons = []  # a list of menu buttons that are available
+        self.current_state = None
         pass
 
     def main_loop(self) -> Choice:
@@ -55,12 +76,8 @@ class Menu:
             self._process_events()
             self._draw()
 
-        # if you have selected something, return the choice from that selection
-        # otherwise, return a default choice with a default function from the Choice class
-        if self.current_selected is not None:
-            return self.current_selected
-        else:
-            return Choice(text="Nothing Selected!")
+        # when the loop is done, return the current state
+        return self.current_state
 
     def _process_events(self):
         pass
