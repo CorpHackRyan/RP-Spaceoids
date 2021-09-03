@@ -197,6 +197,7 @@ class SpaceRocks:
                 if collision:
                     # let's make some sparks if the ship collides with rocks
                     obj.health -= 1
+
                     for i in range(4):
                         spark = Spark(obj.rect)
                         spark.create_rotation_map()
@@ -212,7 +213,7 @@ class SpaceRocks:
                 # rock debris is short lived, like bullets that don't do any damage
                 # they disappear after a little bit, so do sparks, and bullets
                 if obj.range <= 0:
-                    delete_list.append(obj)
+                       delete_list.append(obj)
 
         # now delete all the stuff that should be deleted
         for obj in delete_list:
