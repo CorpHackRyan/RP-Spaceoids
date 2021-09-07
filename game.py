@@ -12,6 +12,13 @@ class SpaceRocks:
         # let's set up the screen
         pygame.display.set_caption("Space Rocks")
         # screen size for convenience during initialization
+
+        """at some point, the screen should be abstracted away from the SpaceRocks class
+        presently, we're doing the rendering and the handling of each "game" in the class
+        itself.  this is fine, but it results in duplicate code here and in either the "menu.py"
+        file or in the "main.py" file.  Ultimately, we should try to DRY ourselves with this
+        code.
+        """
         self.max_screen_x = 800
         self.max_screen_y = 600
         screen_size = (self.max_screen_x, self.max_screen_y)

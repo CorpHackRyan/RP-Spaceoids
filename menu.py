@@ -1,90 +1,95 @@
+"""Pygame Menu Interface
+docs available at:
+https://pygame-menu.readthedocs.io/en/4.1.3/
+
+for RP-Spaceoids
+
+I started to "roll my own" menu functionality, then I realized, hey, this is Python
+there's got to be a library for that!  Seriously, why on God's Green Earth are we
+attempting to reinvent the wheel here.  So, I looked up the "pygame-menu" module
+and found the docs.
+
+This menu is designed to create A "SpaceRocks" object - or, a "game" object.
+The idea is that you can customize the game before playing.
+
+It is likely that we'll need to refactor the SpaceRocks code to quantify precisely "how"
+all the pieces are going to fit together in the final iteration, but using this library
+will dramatically simplify the process by which the game is customized
+"""
+
 import pygame
+import pygame_menu
+from game import SpaceRocks
 
 
-class Choice:
-    # choice objects are the fundamental building blocks of a menu
-    # they contain a "text" object and a function
-    def __init__(self, text="Default", function=lambda: None):
-        # the default text is naturally "Default"
-        # however the default function is a lambda function that returns one
-        # this way it's still a function but doesn't do anything at all if you
-        # call it for whatever reason
-        self.text = text
-        self.function = function
+class GameMenu(pygame_menu.Menu):
+    """
+    This menu class controls the instantiation of new "SpaceRocks" Objects.
+    An individual game can be created through the interface here.  Ultimately,
+    run the functions "create_singleplayer_game" or "create_multiplayer_game" to
+    generate a game of that sort.
+    """
 
-    def __str__(self):
-        # if you try to use it as a string, or use the str() function
-        # it returns the text as well as the text of the function
-        return self.text + " " + str(self.function)
+    def __init__(self,title="Main menu!", width=600, height=500):
+        """
+        initialize the menu witht he following params
 
-    def __eq__(self, other):
-        # this compares the function that you're looking at with another function
-        # it returns equal if they are the same
-        return self.function == other
+        width
+        height
 
-
-class Button:
-    # button objects are similar to Choices however they
-    # execute a function when clicked
-
-    def __init__(self, text="Button", function=lambda: None):
-        # the default text is "button" and just like the other one, the function is a lambda
-        # function that returns None
-        self.text = text
-        self.function = function
-
-    def __eq__(self, other):
-        # checks to see if the actiion_functions are the same
-        return self.function == other
-
-    def __str__(self):
-        # returns the button text and the function as a string
-        return self.text + " " + str(self.function)
-
-
-class Menu:
-    # instances of this menu work like this
-    # you instantiate a menu
-    # you set some of the instances variables that control the behavior of the menu
-    # there's a list you can populate it with choice objects
-    # there's a list you can populate with button objects
-    # run the function "create_menu_map()" to create all the appropriate graphics
-    # then, after it's configured, you run the "main_loop()" function
-    # the main_loop() function returns the selected function from the menu
-    def __init__(self):
-        # first, start up pygame and the instance variables to handle the font, color, etc
+        these params are tweakable, but the default is "600x500"
+        """
 
         pygame.init()
-        self.font = pygame.font.Font('freesansbold.ttf', 32)  # the default font if you decide to keep that
-        self.text_color = (255, 0, 0)  # defaults to RED
-        self.text_color_selected = (0, 255, 0) # defaults to GREEN
-        self.background_color = (0, 0, 0)  # defaults to BLACK
-        self.background_color_selected = (255, 255, 255) # defaults to WHITE
 
-        self.menu_active = True  # this has to be turned on for the main_loop() function to loop
-        self.menu_title = "Menu"
-        self.choices = []  # a list of the menu choices that are available
-        self.buttons = []  # a list of menu buttons that are available
-        self.current_state = None
+        # let's set up the screen
+        # ::REFACTOR:: we need to refactor this to separate game screens from games or menus
+
+        pygame.display.set_caption("Space Rocks")
+        super().__init__(title=title,
+                         width=width,
+                         height=height,
+                         theme=pygame_menu.themes.THEME_BLUE)
+        # screen size for convenience during initialization
+        self.max_screen_x = 800
+        self.max_screen_y = 600
+
+        screen_size = (self.max_screen_x, self.max_screen_y)
+        self.screen = pygame.display.set_mode(screen_size)
+
+        self. name = self.add.text_input("Name : ",
+                                        default="Ryan The Magnificent!")
+
+        self.add.selector("Number of Rocks :",
+                          [(str(i), i) for i in range(1,20)]
+                          )
+
+        self.add.button("Create Singleplayer Game")
+        self.add.button("Create Multiplayer Game")
+        self.add.button("High Scores!")
+        self.add.button("Quit", pygame_menu.events.EXIT)  # close the menu
+
+
+
+    def create_singleplayer_game(self):
+        """
+        this function will return a single player instance of a SpaceRocks game
+        using the data entered in the menu
+        """
         pass
 
-    def main_loop(self) -> Choice:
-        # this is th main loop that runs while pygame is running
-        # to exit from this loop, set self.menu_active = False
-        # the main_loop() function returns a choice object
-        while self.menu_active:
-            self._process_events()
-            self._draw()
-
-        # when the loop is done, return the current state
-        return self.current_state
-
-    def _process_events(self):
-        pass
-
-    def _draw(self):
+    def create_multiplayer_game(self):
+        """
+        this function will return a multi player instance of a SpaceRocks game
+        using the data entered in the menu
+        """
         pass
 
     def __del__(self):
-        # boilerplate code to shut down pygame after use
+        """
+        ::REFACTOR::
+        we need to refactor this along with the screen instantiation
+        :return:
+        """
+        # when the object is deleted, kill Pygame
         pygame.quit()

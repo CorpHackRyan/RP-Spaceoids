@@ -4,11 +4,18 @@
 from game import SpaceRocks
 from ObjectsInSpace import *
 from random import randint, choice
+from menu import GameMenu
+
+pygame.init()
+
+# first we should instantiate a GameMenu object to control the game setup
+main_menu = GameMenu()
+main_menu.mainloop(main_menu.screen)
+
 
 # instantiate a "game" object for the game
 game = SpaceRocks()
 
-print("Loading Objects!")
 # let's initialize the objects to be used in the game object
 # we can instantiate boulders however we want in a game
 # to start we do it randomly and add some random rotation, etc.
