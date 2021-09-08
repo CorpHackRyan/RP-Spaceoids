@@ -1,12 +1,12 @@
 # Ryan and Pat's Spaceoids
 # a comically terrible asteroids clone
 
-from game import SpaceRocks
+from game import Game
 from ObjectsInSpace import *
 from random import randint, choice
 from menu import GameMenu
 """"
-SpaceRocks is a class that has a "game" instance
+Game is a class that has a "game" instance
 Objects in Space is the wrapper for spaceships rocks and bullets
 
 

@@ -9,10 +9,10 @@ there's got to be a library for that!  Seriously, why on God's Green Earth are w
 attempting to reinvent the wheel here.  So, I looked up the "pygame-menu" module
 and found the docs.
 
-This menu is designed to create A "SpaceRocks" object - or, a "game" object.
+This menu is designed to create A "Game" object - or, a "game" object.
 The idea is that you can customize the game before playing.
 
-It is likely that we'll need to refactor the SpaceRocks code to quantify precisely "how"
+It is likely that we'll need to refactor the Game code to quantify precisely "how"
 all the pieces are going to fit together in the final iteration, but using this library
 will dramatically simplify the process by which the game is customized
 """
@@ -25,13 +25,13 @@ from random import randint, choice
 
 def create_singleplayer_game(number_of_space_rocks: int,
                                screen: pygame.surface,
-                               difficulty: int = 2) -> SpaceRocks:
+                               difficulty: int = 2) -> Game:
 
     # let's initialize the objects to be used in the game object
     # we can instantiate boulders however we want in a game
     # to start we do it randomly and add some random rotation, etc.
     # 9/2 - pat
-    game = SpaceRocks(screen)
+    game = Game(screen)
     for i in range(number_of_space_rocks):
         new_rock = SpaceBoulder()
         new_rock.rect.centerx = randint(0, screen.get_width())
@@ -62,7 +62,7 @@ def create_singleplayer_game(number_of_space_rocks: int,
 
 class GameMenu(pygame_menu.Menu):
     """
-    This menu class controls the instantiation of new "SpaceRocks" Objects.
+    This menu class controls the instantiation of new "Game" Objects.
     An individual game can be created through the interface here.  Ultimately,
     run the functions "create_singleplayer_game" or "create_multiplayer_game" to
     generate a game of that sort.
@@ -88,10 +88,10 @@ class GameMenu(pygame_menu.Menu):
                          height=height,
                          theme=pygame_menu.themes.THEME_BLUE)
 
-        self.label = self.add.label("Welcome to SpaceRocks", label_id="message_box")
+        self.label = self.add.label("Welcome to Space Rocks!", label_id="message_box")
 
         self.name = self.add.text_input("Name : ",
-                                        default="Ryan The Magnificent!")
+                                        default="Bilbo Baggins")
 
         self.add.selector("Number of Rocks :",
                           [str(i) for i in range(1, 10)],
@@ -112,7 +112,7 @@ class GameMenu(pygame_menu.Menu):
 
     def _play_singleplayer_game(self, *args):
         """
-        this function will return a single player instance of a SpaceRocks game
+        this function will return a single player instance of a game
         using the data entered in the menu
         """
         self.game = create_singleplayer_game(self.rock_count, self.screen)
@@ -122,7 +122,7 @@ class GameMenu(pygame_menu.Menu):
 
     def _create_multiplayer_game(self):
         """
-        this function will return a multi player instance of a SpaceRocks game
+        this function will return a multi player instance of a game
         using the data entered in the menu
         """
         pass

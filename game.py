@@ -3,12 +3,12 @@ import pygame
 from ObjectsInSpace import *
 
 
-class SpaceRocks:
+class Game:
     def __init__(self, screen: pygame.Surface):
 
         # screen size for convenience during initialization
 
-        """at some point, the screen should be abstracted away from the SpaceRocks class
+        """at some point, the screen should be abstracted away from the Game class
         presently, we're doing the rendering and the handling of each "game" in the class
         itself.  this is fine, but it results in duplicate code here and in either the "menu.py"
         file or in the "main.py" file.  Ultimately, we should try to DRY ourselves with this
@@ -42,7 +42,7 @@ class SpaceRocks:
         # menu instantiation here?
         # my intuition is that for something simple like this, maybe we should have
         # any menu stuff handled in the instantiation of the class?  I don't know - TBD.
-        # Update on 9/2 - I think menus should be outside the SpaceRocks class - PP
+        # Update on 9/2 - I think menus should be outside the Game class - PP
 
         # text default stuff
         # we need a font for Pygame, change your fonts here
