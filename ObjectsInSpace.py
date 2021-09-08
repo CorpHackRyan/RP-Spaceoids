@@ -163,6 +163,7 @@ class Player(SpaceObject):
         self.rect = self.image.get_rect()
 
         self.thruster_rate = 3
+        self.max_speed = 20
 
         pygame.sprite.Sprite.__init__(self)  # you have to do this to initialize the sprite
 
