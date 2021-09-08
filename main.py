@@ -1,9 +1,7 @@
 # Ryan and Pat's Spaceoids
 # a comically terrible asteroids clone
 
-from game import Game
 from ObjectsInSpace import *
-from random import randint, choice
 from menu import GameMenu
 """"
 Game is a class that has a "game" instance
@@ -30,10 +28,6 @@ screen = pygame.display.set_mode(screen_size)
 # first we should instantiate a GameMenu object to control the game setup
 main_menu = GameMenu(screen)
 main_menu.mainloop(screen)
-
-
-# run the game loop
-print(game.main_loop())
 
 # close out pygame when all is done
 pygame.quit()

@@ -24,9 +24,8 @@ from random import randint, choice
 
 
 def create_singleplayer_game(number_of_space_rocks: int,
-                               screen: pygame.surface,
-                               difficulty: int = 2) -> Game:
-
+                             screen: pygame.surface,
+                             difficulty: int = 2) -> Game:
     # let's initialize the objects to be used in the game object
     # we can instantiate boulders however we want in a game
     # to start we do it randomly and add some random rotation, etc.

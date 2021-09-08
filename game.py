@@ -24,7 +24,6 @@ class Game:
         self.max_screen_y = screen.get_height()
         self.screen = screen
 
-
         # sprite Group
         self.space_objects = pygame.sprite.Group()
 
@@ -49,7 +48,7 @@ class Game:
         self.font = pygame.font.Font('freesansbold.ttf', 32)
 
         # let's set up the text box for the health readout
-        self.health_readout = self.font.render('Health: 100%', True, (255 , 0, 0), (255, 255, 255))
+        self.health_readout = self.font.render('Health: 100%', True, (255, 0, 0), (255, 255, 255))
         self.health_readout_rect = self.health_readout.get_rect()
         self.health_readout_rect.centery = self.max_screen_y - self.health_readout_rect.height
         self.health_readout_rect.centerx = self.health_readout_rect.width
@@ -217,7 +216,7 @@ class Game:
                 # rock debris is short lived, like bullets that don't do any damage
                 # they disappear after a little bit, so do sparks, and bullets
                 if obj.range <= 0:
-                       delete_list.append(obj)
+                    delete_list.append(obj)
 
         # finally, we need to process the "winning" logic here
         if len(rock_group) == 0:
