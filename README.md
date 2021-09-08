@@ -8,5 +8,5 @@ Largely this is just a vehicle for us to learn Git better, and tinker with Pygam
 
 9/2 Pat got the basic functionality of single player running.
 
-9/7: Pat got basic menu functionality working
+9/7: Pat got basic menu functionality working, PEP8 stuff, and refactored some names.
 
