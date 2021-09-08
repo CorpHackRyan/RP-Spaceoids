@@ -35,4 +35,4 @@ jobs:
       run: |
         #  python -m pytest
         # theoretically we could have our own tests in here?
-        python -m pat_test_test.py
+        python -m pat_test_test
