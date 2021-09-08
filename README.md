@@ -10,3 +10,4 @@ Largely this is just a vehicle for us to learn Git better, and tinker with Pygam
 
 9/7: Pat got basic menu functionality working, PEP8 stuff, and refactored some names.
 
+9/8: Ryan created a discussions tab. Pat added issues to be fixed under issues tab.
