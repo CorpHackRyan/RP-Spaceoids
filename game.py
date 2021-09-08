@@ -4,13 +4,8 @@ from ObjectsInSpace import *
 
 
 class SpaceRocks:
-    def __init__(self):
-        # initialize Pygame
-        # this has to fire up when initializing the instance of a SpaceRocks class
-        pygame.init()
+    def __init__(self, screen: pygame.Surface):
 
-        # let's set up the screen
-        pygame.display.set_caption("Space Rocks")
         # screen size for convenience during initialization
 
         """at some point, the screen should be abstracted away from the SpaceRocks class
@@ -18,17 +13,23 @@ class SpaceRocks:
         itself.  this is fine, but it results in duplicate code here and in either the "menu.py"
         file or in the "main.py" file.  Ultimately, we should try to DRY ourselves with this
         code.
-        """
-        self.max_screen_x = 800
-        self.max_screen_y = 600
-        screen_size = (self.max_screen_x, self.max_screen_y)
-        self.screen = pygame.display.set_mode(screen_size)
 
-        # game clock
-        self.clock = pygame.time.Clock()
+
+        update 9/7/21  refactoring this code to pass a surface object to this class to do work on it
+
+        """
+
+        # handling the screen
+        self.max_screen_x = screen.get_width()
+        self.max_screen_y = screen.get_height()
+        self.screen = screen
+
 
         # sprite Group
         self.space_objects = pygame.sprite.Group()
+
+        # game clock
+        self.clock = pygame.time.Clock()
 
         # score and gameplay stuff here
         # obviously we'll adjust this when we add multiplayer
@@ -61,10 +62,6 @@ class SpaceRocks:
         self.score_readout_rect = self.score_readout.get_rect()
         self.score_readout_rect.centery = self.max_screen_y - self.score_readout_rect.height
         self.score_readout_rect.centerx = self.max_screen_x - self.score_readout_rect.width
-
-    def __del__(self):
-        # when the object is deleted, kill Pygame
-        pygame.quit()
 
     def main_loop(self):
 
@@ -221,6 +218,11 @@ class SpaceRocks:
                 # they disappear after a little bit, so do sparks, and bullets
                 if obj.range <= 0:
                        delete_list.append(obj)
+
+        # finally, we need to process the "winning" logic here
+        if len(rock_group) == 0:
+            self.alive = False  # end the game loop
+            self.results = f"You have won.  Congratulations!  Final Score: {self.score}"
 
         # now delete all the stuff that should be deleted
         for obj in delete_list:

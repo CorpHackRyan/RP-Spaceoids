@@ -19,7 +19,45 @@ will dramatically simplify the process by which the game is customized
 
 import pygame
 import pygame_menu
-from game import SpaceRocks
+from game import *
+from random import randint, choice
+
+
+def create_singleplayer_game(number_of_space_rocks: int,
+                               screen: pygame.surface,
+                               difficulty: int = 2) -> SpaceRocks:
+
+    # let's initialize the objects to be used in the game object
+    # we can instantiate boulders however we want in a game
+    # to start we do it randomly and add some random rotation, etc.
+    # 9/2 - pat
+    game = SpaceRocks(screen)
+    for i in range(number_of_space_rocks):
+        new_rock = SpaceBoulder()
+        new_rock.rect.centerx = randint(0, screen.get_width())
+        new_rock.rect.centery = randint(0, screen.get_height())
+        new_rock.dx = randint(-difficulty, difficulty)
+        new_rock.dy = randint(-difficulty, difficulty)
+
+        new_rock.theta = randint(0, 360)
+        new_rock.dtheta = choice([1, -1])
+        new_rock.create_rotation_map()
+        game.space_objects.add(new_rock)
+
+    # we've got the asteroids built, let's instantiate a "Player"
+    # we instantiate a "Player" here, stick them in the middle of the screen
+    player_ship = Player()
+    player_ship.health = 100
+    # let's place the player in the middle of the game screen
+    player_ship.rect.centerx = game.max_screen_x / 2
+    player_ship.rect.centery = game.max_screen_y / 2
+    player_ship.dtheta = 0
+    player_ship.create_rotation_map()
+    # it's a player ship, so we need to flag the ship as controllable
+    player_ship.is_controllable = True
+    game.space_objects.add(player_ship)  # finally add it to the space_objects
+
+    return game
 
 
 class GameMenu(pygame_menu.Menu):
@@ -30,7 +68,7 @@ class GameMenu(pygame_menu.Menu):
     generate a game of that sort.
     """
 
-    def __init__(self,title="Main menu!", width=600, height=500):
+    def __init__(self, screen: pygame.surface, title="Main menu!"):
         """
         initialize the menu witht he following params
 
@@ -40,56 +78,51 @@ class GameMenu(pygame_menu.Menu):
         these params are tweakable, but the default is "600x500"
         """
 
-        pygame.init()
-
         # let's set up the screen
-        # ::REFACTOR:: we need to refactor this to separate game screens from games or menus
+        width = screen.get_width()
+        height = screen.get_height()
+        self.screen = screen
 
-        pygame.display.set_caption("Space Rocks")
         super().__init__(title=title,
                          width=width,
                          height=height,
                          theme=pygame_menu.themes.THEME_BLUE)
-        # screen size for convenience during initialization
-        self.max_screen_x = 800
-        self.max_screen_y = 600
 
-        screen_size = (self.max_screen_x, self.max_screen_y)
-        self.screen = pygame.display.set_mode(screen_size)
+        self.label = self.add.label("Welcome to SpaceRocks", label_id="message_box")
 
-        self. name = self.add.text_input("Name : ",
+        self.name = self.add.text_input("Name : ",
                                         default="Ryan The Magnificent!")
 
         self.add.selector("Number of Rocks :",
-                          [(str(i), i) for i in range(1,20)]
-                          )
+                          [str(i) for i in range(1, 10)],
+                          onchange=self._change_rock_count,
+                          default=3)
 
-        self.add.button("Create Singleplayer Game")
+        self.add.button("Create Singleplayer Game",
+                        action=self._play_singleplayer_game)
+
         self.add.button("Create Multiplayer Game")
         self.add.button("High Scores!")
         self.add.button("Quit", pygame_menu.events.EXIT)  # close the menu
+        self.rock_count = 3
+        self.game = create_singleplayer_game(self.rock_count, screen)  # default game state
 
+    def _change_rock_count(self, *args) -> None:
+        self.rock_count = int(args[0][0])
 
-
-    def create_singleplayer_game(self):
+    def _play_singleplayer_game(self, *args):
         """
         this function will return a single player instance of a SpaceRocks game
         using the data entered in the menu
         """
-        pass
+        self.game = create_singleplayer_game(self.rock_count, self.screen)
+        new_score = self.game.main_loop()
+        self.label.set_title(new_score)
+        # do something with the score when you win!
 
-    def create_multiplayer_game(self):
+    def _create_multiplayer_game(self):
         """
         this function will return a multi player instance of a SpaceRocks game
         using the data entered in the menu
         """
         pass
-
-    def __del__(self):
-        """
-        ::REFACTOR::
-        we need to refactor this along with the screen instantiation
-        :return:
-        """
-        # when the object is deleted, kill Pygame
-        pygame.quit()
