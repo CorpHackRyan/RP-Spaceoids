@@ -33,4 +33,6 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=30 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-       #  python -m pytest
+        #  python -m pytest
+        # theoretically we could have our own tests in here?
+        python -m pat_test_test.py
