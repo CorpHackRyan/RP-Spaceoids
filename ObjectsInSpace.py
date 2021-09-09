@@ -5,12 +5,15 @@ from random import choice
 
 
 class SpaceObject(Sprite):
-    # each Space Object has some basic data that's attached to it
-    # and they all inherit from the Sprite class
+    """
+    each Space Object has some basic data that's attached to it
+    and they all inherit from the Sprite class"""
     def __init__(self):
-        # we define the basic physical location and properties of a space object during
-        # instantiation, a space object can have a position, a angle theta, a velocity
-        # causes a certain amount of collision damage, has a health, etc.
+        """
+
+        we define the basic physical location and properties of a space object during
+        instantiation, a space object can have a position, a angle theta, a velocity
+        causes a certain amount of collision damage, has a health, etc."""
 
         # first, let's get all the stuff from the parent class
         super().__init__()
@@ -28,9 +31,6 @@ class SpaceObject(Sprite):
         self.theta = 0  # angle theta of the sprite, basically the heading
 
         # these are the values for velocity
-        # we'll figure out how to properly scale these later, but at first glance
-        # I suspect the velocities should be in "pixels / second" and the angular velocity in
-        # in "radians / second"
         self.dx = 0
         self.dy = 0
         self.dtheta = 0
@@ -55,9 +55,7 @@ class SpaceObject(Sprite):
         self.AI_controllable = False
 
     def create_rotation_map(self):
-        # make a hash table of all the rotations
-        # I did this because rotating every time was ponderously slow
-        # this let me load all the angles into a dictionary
+        # make a hash table of all the rotations for superior rotation speed
         for angle in range(-15, 380):
             # it's a little more than 360 degrees because rounding errors can cause a key error
             orig_image = self.image.copy()
@@ -193,8 +191,6 @@ class RockDebris(SpaceObject):
 class Spark(SpaceObject):
     # these are "sparks" objects
     # they're basically the same as RockDebris
-    # but I think it's more readable to just make
-    # a separate object
     def __init__(self, rect):
         # when a laser hits a rock, make some rock debris sprites that list a little bit
         super().__init__()  # you have to do this to initialize the Space Object class

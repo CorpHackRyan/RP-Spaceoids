@@ -30,20 +30,16 @@ class Game:
         # game clock
         self.clock = pygame.time.Clock()
 
-        # score and gameplay stuff here
-        # obviously we'll adjust this when we add multiplayer
-        # but for now, it's simple, self.alive controls the main while loop
-        # and score is the score!
+        """score and gameplay stuff here
+        obviously we'll adjust this when we add multiplayer
+        but for now, it's simple, self.alive controls the main while loop
+        and score is the score!"""
         self.score = 0
         self.alive = True
         self.results = "Game Over"  # the main loop will return this variable when the game is complete
 
-        # menu instantiation here?
-        # my intuition is that for something simple like this, maybe we should have
-        # any menu stuff handled in the instantiation of the class?  I don't know - TBD.
-        # Update on 9/2 - I think menus should be outside the Game class - PP
+        # text default stuff below
 
-        # text default stuff
         # we need a font for Pygame, change your fonts here
         self.font = pygame.font.Font('freesansbold.ttf', 32)
 
@@ -53,10 +49,11 @@ class Game:
         self.health_readout_rect.centery = self.max_screen_y - self.health_readout_rect.height
         self.health_readout_rect.centerx = self.health_readout_rect.width
 
-        # let's set up a text box for your score
-        # this is basically duplicate code from above, but the names and colors are slightly different
-        # not exactly DRY, but writing a function to generate this for only a few things seems like more
-        # work than just making a score readout
+        """
+        let's set up a text box for your score
+        this is basically duplicate code from above, but the names and colors are slightly different
+        not exactly DRY, but writing a function to generate this for only a few things seems like more
+        work than just making a score readout"""
         self.score_readout = self.font.render('Score: 0', True, (0, 255, 0), (255, 255, 255))
         self.score_readout_rect = self.score_readout.get_rect()
         self.score_readout_rect.centery = self.max_screen_y - self.score_readout_rect.height
@@ -82,18 +79,17 @@ class Game:
         return self.results
 
     def _process_events(self, event):
-        # pygame events processed here
-        # I reckon we could eventually refactor this into
-        # a class?  I'm not sure of the best way to handle this yet -pp
 
         # first, let's process the process of properly quitting pygame
         if event.type == pygame.QUIT:
-            # first let's kill the loop running the variable
-            # why?  Well - I'd imagine there's some multi threading under the hood
-            # and God knows what processes will still be running, let's make sure
-            # there's not a chance to loop through again, as Ripley would say
-            # nuke it from orbit, it's the only way to be sure
-            # i'll add that after adding this event handler
+            """
+            first let's kill the loop running the variable
+            why?  Well - I'd imagine there's some multi threading under the hood
+            and God knows what processes will still be running, let's make sure
+            there's not a chance to loop through again, as Ripley would say
+            nuke it from orbit, it's the only way to be sure
+            i'll add that after adding this event handler"""
+
             pygame.quit()
             sys.exit()  # finally, let's kill everything that's left
 
@@ -125,11 +121,12 @@ class Game:
         delete_list = []  # this list of sprites will be deleted at the end of this method
         add_list = []  # this is list of sprites will be added at the end of this method
 
-        # rock_group is a sprite group that we can do logic on more conveniently
-        # we loop through the "space_objects" and add any SpaceBoulder to the
-        # rock group, we'll use this later to manage collisions
-        # we also create a laser group here to see measure the
-        # damage done to rocks
+        """ 
+        rock_group is a sprite group that we can do logic on more conveniently
+        we loop through the "space_objects" and add any SpaceBoulder to the
+        rock group, we'll use this later to manage collisions
+        we also create a laser group here to see measure the
+        damage done to rocks"""
         rock_group = pygame.sprite.Group()
         bullet_group = pygame.sprite.Group()
         for obj in self.space_objects:
@@ -141,10 +138,11 @@ class Game:
         # now iterate through the objects in self.space_objects and perform logic on it
         for obj in self.space_objects:
 
-            # let's warm the object back around if it goes outside the screen
-            # all this logic does is warp stuff to the opposite side of the screen
-            # if an object goes too far in one direction.  Effectively the geometry of
-            # this mini universe is toroidal
+            """
+            let's warm the object back around if it goes outside the screen
+            all this logic does is warp stuff to the opposite side of the screen
+            if an object goes too far in one direction.  Effectively the geometry of
+            this mini universe is toroidal"""
             if obj.rect.centerx > (self.max_screen_x + obj.rect.width):
                 obj.rect.centerx = -obj.rect.width
             if obj.rect.centerx < -obj.rect.width:
@@ -159,9 +157,10 @@ class Game:
                 # let's check for collisions between the rock_group and bullets
                 bullet_hit = pygame.sprite.spritecollide(obj, rock_group, False, pygame.sprite.collide_mask)
                 if bullet_hit:
-                    # if there's a collision between a laser and and rock
-                    # then make a couple of debris rocks
-                    # then add the laser beam to the delete list
+                    """
+                    if there's a collision between a laser and and rock
+                    then make a couple of debris rocks
+                    then add the laser beam to the delete list"""
                     for i in range(5):
                         rock_debris = RockDebris(obj.rect)
                         rock_debris.create_rotation_map()
@@ -176,8 +175,9 @@ class Game:
             if isinstance(obj, SpaceBoulder):
                 # if the boulder's health is zero... add it to the delete list
                 if obj.health <= 0:
-                    # if the health of a space boulder gets to zero, let's
-                    # make 4 pieces of debris to fly off
+                    """
+                    if the health of a space boulder gets to zero, let's
+                    make 4 pieces of debris to fly off"""
                     for i in range(4):
                         rock_debris = RockDebris(obj.rect)
                         rock_debris.create_rotation_map()
@@ -239,8 +239,6 @@ class Game:
         self.space_objects.draw(self.screen)
 
         # now let's draw the player health and score
-        # later if there ends up being a lot more data displayed on the screen
-        # we could abstract this some, but for now, this will be sufficient. -pp
         self.screen.blit(self.health_readout, self.health_readout_rect)
         self.screen.blit(self.score_readout, self.score_readout_rect)
 
