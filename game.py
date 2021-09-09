@@ -76,6 +76,7 @@ class Game:
             # now tick the clock forward
             self.clock.tick(60)
 
+        # Finally, return the game results from playing.
         return self.results
 
     def _process_events(self, event):
@@ -193,7 +194,7 @@ class Game:
             if isinstance(obj, Player):
                 if obj.health <= 0:
                     self.alive = False
-                    self.results = f"You have died.  Game Over.  Final Score: {self.score}"
+                    self.results = (f"You have died.  Game Over.  Final Score: {self.score}", self.score)
 
                 # check to see if the player ship has collided with the rocks
                 collision = pygame.sprite.spritecollide(obj, rock_group, False, pygame.sprite.collide_mask)
@@ -221,7 +222,7 @@ class Game:
         # finally, we need to process the "winning" logic here
         if len(rock_group) == 0:
             self.alive = False  # end the game loop
-            self.results = f"You have won.  Congratulations!  Final Score: {self.score}"
+            self.results = (f"You have won.  Congratulations!  Final Score: {self.score}", self.score)
 
         # now delete all the stuff that should be deleted
         for obj in delete_list:

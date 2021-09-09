@@ -21,6 +21,7 @@ import pygame
 import pygame_menu
 from game import *
 from random import randint, choice
+import pickle
 
 
 def create_singleplayer_game(number_of_space_rocks: int,
@@ -116,7 +117,14 @@ class GameMenu(pygame_menu.Menu):
         self.add.button("High Scores!")
         self.add.button("Quit", pygame_menu.events.EXIT)  # close the menu
         self.rock_count = 3
-        self.game = create_singleplayer_game(self.rock_count, screen)  # default game state
+
+        # try to load the save states
+        try:
+            save_file = open("scores.p", "rb")
+            self.high_scores = pickle.load(save_file)
+        except FileNotFoundError as err:
+            # if that didn't work, just make the highscores variable equal to []
+            self.high_scores = []
 
     def _change_rock_count(self, *args) -> None:
         self.rock_count = int(args[0][0])
@@ -128,8 +136,22 @@ class GameMenu(pygame_menu.Menu):
         """
         self.game = create_singleplayer_game(self.rock_count, self.screen)
         new_score = self.game.main_loop()
-        self.label.set_title(new_score)
+        self._post_score(new_score[1], self.name.get_value())  # post the score to the
+
+        self.label.set_title(new_score[0])
         # do something with the score when you win!
+
+    def _post_score(self, score, name) -> None:
+        # add the high score to the score list
+        self.high_scores.append((name, score))  # append a tuple with the name and score of the player
+
+        # when you close down the game, save the scores
+        # try to load the save states
+        try:
+            save_file = open("scores.p", "wb")
+            pickle.dump(self.high_scores, save_file)
+        except Exception as err:
+            print("Error saving file.")
 
     def _create_multiplayer_game(self):
         """
