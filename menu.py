@@ -27,19 +27,7 @@ def create_singleplayer_game(number_of_space_rocks: int,
                              screen: pygame.surface,
                              difficulty: int = 2) -> Game:
     game = Game(screen)
-    for i in range(number_of_space_rocks):
-        new_rock = SpaceBoulder()
-        new_rock.rect.centerx = randint(0, screen.get_width())
-        new_rock.rect.centery = randint(0, screen.get_height())
-        new_rock.dx = randint(-difficulty, difficulty)
-        new_rock.dy = randint(-difficulty, difficulty)
 
-        new_rock.theta = randint(0, 360)
-        new_rock.dtheta = choice([1, -1])
-        new_rock.create_rotation_map()
-        game.space_objects.add(new_rock)
-
-    # we've got the asteroids built, let's instantiate a "Player"
     # we instantiate a "Player" here, stick them in the middle of the screen
     player_ship = Player()
     player_ship.health = 100
@@ -51,6 +39,34 @@ def create_singleplayer_game(number_of_space_rocks: int,
     # it's a player ship, so we need to flag the ship as controllable
     player_ship.is_controllable = True
     game.space_objects.add(player_ship)  # finally add it to the space_objects
+
+    """
+    now let's draw the asteroids making sure that none of them overlap with the player ship
+    at start up but they're still randomly distributed in the frame
+    
+    we'll do this by plotting them randomly on the screen, then if they overlap
+    plotting them again
+    """
+    rocks_to_add = number_of_space_rocks
+    while rocks_to_add >= 0:
+        new_rock = SpaceBoulder()
+        new_rock.rect.centerx = randint(0, screen.get_width())
+        new_rock.rect.centery = randint(0, screen.get_height())
+        new_rock.dx = randint(-difficulty, difficulty)
+        new_rock.dy = randint(-difficulty, difficulty)
+
+        new_rock.theta = randint(0, 360)
+        new_rock.dtheta = choice([1, -1])
+        new_rock.create_rotation_map()
+
+        # check to see if the rock collides with the player, if so loop again
+        collides = pygame.sprite.collide_rect(player_ship, new_rock)
+        if collides:
+            continue
+        else:
+            # otherwise add this rock to the sprite group
+            game.space_objects.add(new_rock)
+            rocks_to_add = rocks_to_add - 1
 
     return game
 
