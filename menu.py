@@ -114,7 +114,7 @@ class GameMenu(pygame_menu.Menu):
                         action=self._play_singleplayer_game)
 
         self.add.button("Create Multiplayer Game")
-        self.add.button("High Scores!")
+        self.add.button("High Scores!", action=self.display_high_scores)
         self.add.button("Quit", pygame_menu.events.EXIT)  # close the menu
         self.rock_count = 3
 
@@ -152,6 +152,13 @@ class GameMenu(pygame_menu.Menu):
             pickle.dump(self.high_scores, save_file)
         except Exception as err:
             print("Error saving file.")
+
+    def display_high_scores(self) -> None:
+        # display a menu with the scores
+
+        # debug
+        print(self.high_scores)
+
 
     def _create_multiplayer_game(self):
         """
