@@ -15,7 +15,7 @@ class SpaceObject(Sprite):
         instantiation, a space object can have a position, a angle theta, a velocity
         causes a certain amount of collision damage, has a health, etc."""
 
-        # first, let's get all the stuff from the parent class
+        # first, let's get all the stuff from the sprite class
         super().__init__()
 
         # the default image
