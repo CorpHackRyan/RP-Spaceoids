@@ -17,7 +17,6 @@ all the pieces are going to fit together in the final iteration, but using this 
 will dramatically simplify the process by which the game is customized
 """
 
-import pygame
 import pygame_menu
 from game import *
 from random import randint, choice
@@ -123,6 +122,7 @@ class GameMenu(pygame_menu.Menu):
             save_file = open("scores.p", "rb")
             self.high_scores = pickle.load(save_file)
         except FileNotFoundError as err:
+            print(err)
             # if that didn't work, just make the highscores variable equal to []
             self.high_scores = []
 
@@ -149,16 +149,25 @@ class GameMenu(pygame_menu.Menu):
         # try to load the save states
         try:
             save_file = open("scores.p", "wb")
+            # sort the list with the second tuple entry in descending order
+            self.high_scores.sort(key=lambda tup: tup[1], reverse=True)
+            del self.high_scores[10:]  # we only care about the top ten
             pickle.dump(self.high_scores, save_file)
         except Exception as err:
-            print("Error saving file.")
+            print("Error saving file.", err)
 
     def display_high_scores(self) -> None:
         # display a menu with the scores
 
-        # debug
-        print(self.high_scores)
+        menu = pygame_menu.Menu('High Scores',
+                                self.screen.get_width(),
+                                self.screen.get_height(),
+                                theme=pygame_menu.themes.THEME_BLUE)
 
+        menu.add.button("Go Back", action=lambda: menu.disable())  # simply disable the menu to return
+        for score in self.high_scores:
+            menu.add.label(f"Player: {score[0]}, Score:  {score[1]}")
+        menu.mainloop(self.screen)
 
     def _create_multiplayer_game(self):
         """
