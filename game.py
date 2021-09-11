@@ -67,6 +67,8 @@ class Game:
             for event in pygame.event.get():
                 self._process_events(event)
 
+            self._process_controls()
+
             # sprite collision, physics stuff, etc can go in this function
             self._process_game_logic()
 
@@ -78,6 +80,51 @@ class Game:
 
         # Finally, return the game results from playing.
         return self.results
+
+    def _process_controls(self) -> None:
+        # control of the sprites works by turning activating the appropriate methods
+        keys = pygame.key.get_pressed()  # first get the pressed keys
+
+        controllables = [sprite for sprite in self.space_objects if sprite.is_controllable]
+        # a list of all the sprites that are player controllable
+        for sprite in controllables:
+            # go through each key press that a controllable vehicle has and execute the command
+            if keys[pygame.K_LEFT]:
+                # rotate left
+                sprite.rotate_left()
+
+            if keys[pygame.K_RIGHT]:
+                # rotate right
+                sprite.rotate_right()
+
+            if keys[pygame.K_UP]:
+                sprite.accelerate()
+
+            if keys[pygame.K_DOWN]:
+                sprite.decelerate()
+
+            # now if neither the left or right keys are pressed, stop rotation
+            if (not keys[pygame.K_RIGHT]) and (not keys[pygame.K_LEFT]):
+                sprite.stop_rotation()
+
+            if keys[pygame.K_SPACE]:
+                if not sprite.firing:
+                    # if you're not firing, go ahead and fire a laser
+                    bullet = sprite.fire()
+                    bullet.create_rotation_map()
+                    self.space_objects.add(bullet)
+                    sprite.firing = True  # now set firing to true
+
+                if sprite.firing:
+                    # we need to count down until the next time you can fire
+                    sprite.fire_counter -= 1
+
+                # now we need to handle the logic of the fire counter
+                if sprite.fire_counter <= 0:
+                    sprite.firing = False  # the gun has cooled down
+                    sprite.fire_counter = sprite.fire_counter_rate  # reset the counter
+
+
 
     def _process_events(self, event):
 
@@ -94,27 +141,6 @@ class Game:
             pygame.quit()
             sys.exit()  # finally, let's kill everything that's left
 
-        # control of the sprites works by turning off or on sprites' thrusters
-        controllables = [sprite for sprite in self.space_objects if sprite.is_controllable]
-        # a list of all the sprites that are player controllable
-        for sprite in controllables:
-            if event.type == pygame.KEYUP:
-                # when you let up on the keys, the rotation stops
-                sprite.stop_rotation()
-            elif event.type == pygame.KEYDOWN:
-                # when you push a key, let's turn thrusters on or off
-                if event.key == pygame.K_LEFT:
-                    sprite.rotate_left()
-                elif event.key == pygame.K_RIGHT:
-                    sprite.rotate_right()
-                elif event.key == pygame.K_UP:
-                    sprite.accelerate()
-                elif event.key == pygame.K_DOWN:
-                    sprite.decelerate()
-                elif event.key == pygame.K_SPACE:
-                    bullet = sprite.fire()
-                    bullet.create_rotation_map()
-                    self.space_objects.add(bullet)
 
     def _process_game_logic(self):
         # start with processing the simple physics

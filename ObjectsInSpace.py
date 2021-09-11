@@ -3,7 +3,6 @@ from pygame.sprite import Sprite
 from math import atan2, radians, sin, cos, sqrt
 from random import choice
 
-
 class SpaceObject(Sprite):
     """
     each Space Object has some basic data that's attached to it
@@ -36,6 +35,11 @@ class SpaceObject(Sprite):
         self.dtheta = 0
         self.thruster_rate = 0  # this will determine how fast a particular object can rotate by default
         self.max_speed = 10  # in pixels per second
+
+        # fire control
+        self.firing = False
+        self.fire_counter_rate = 20  # this variable controls how fast you're firing
+        self.fire_counter = self.fire_counter_rate
 
         # default health
         self.max_health = 100
@@ -78,10 +82,18 @@ class SpaceObject(Sprite):
         new_dx = self.dx + cos(theta) * self.thruster_rate
         new_dy = self.dy - sin(theta) * self.thruster_rate
 
+        new_speed_vector_length = sqrt(new_dx ** 2 + new_dy ** 2)
+
         # if that doesn't exceed the max speed then go ahead and add to speed
-        if sqrt(new_dx ** 2 + new_dy ** 2) < self.max_speed:
-            self.dx += cos(theta) * self.thruster_rate
-            self.dy += -sin(theta) * self.thruster_rate
+        if new_speed_vector_length < self.max_speed:
+            self.dx = new_dx
+            self.dy = new_dy
+        else:
+            # if you're already at max speed, then we want to only change the direction
+            # not the magnitude
+            self.dx = (new_dx / new_speed_vector_length) * self.max_speed
+            self.dy = (new_dy / new_speed_vector_length) * self.max_speed
+
 
     def decelerate(self):
         # this works by getting the current angle theta from the heading of the ship
@@ -161,7 +173,7 @@ class Player(SpaceObject):
         self.rect = self.image.get_rect()
 
         self.thruster_rate = 3
-        self.max_speed = 20
+        self.max_speed = 7
 
         pygame.sprite.Sprite.__init__(self)  # you have to do this to initialize the sprite
 
