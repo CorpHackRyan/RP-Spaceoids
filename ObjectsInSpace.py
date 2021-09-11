@@ -3,6 +3,7 @@ from pygame.sprite import Sprite
 from math import atan2, radians, sin, cos, sqrt
 from random import choice
 
+
 class SpaceObject(Sprite):
     """
     each Space Object has some basic data that's attached to it

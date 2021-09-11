@@ -67,7 +67,13 @@ class Game:
             for event in pygame.event.get():
                 self._process_events(event)
 
-            self._process_controls()
+            # controls processes here
+            self._process_keyboard_controls()
+            self._prcess_network_controls()
+
+            # networking to control game state here
+            self._send_network_commands()
+            self._receive_network_commands()
 
             # sprite collision, physics stuff, etc can go in this function
             self._process_game_logic()
@@ -81,7 +87,27 @@ class Game:
         # Finally, return the game results from playing.
         return self.results
 
-    def _process_controls(self) -> None:
+    def _process_network_controls(self) -> None:
+        """
+        Network controls will be processed here.
+        This should be roughly analogous to the _process_keyboard_controls method
+
+        """
+        pass
+
+    def _send_network_commands(self) -> None:
+        """
+        This is where the network send commands will live.
+        """
+        pass
+
+    def _receive_network_commands(self) -> None:
+        """
+        We'll receive the network commands here to update the game state.
+        """
+        pass
+
+    def _process_keyboard_controls(self) -> None:
         # control of the sprites works by turning activating the appropriate methods
         keys = pygame.key.get_pressed()  # first get the pressed keys
 
