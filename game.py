@@ -69,7 +69,7 @@ class Game:
 
             # controls processes here
             self._process_keyboard_controls()
-            self._prcess_network_controls()
+            self._process_network_controls()
 
             # networking to control game state here
             self._send_network_commands()
@@ -150,8 +150,6 @@ class Game:
                     sprite.firing = False  # the gun has cooled down
                     sprite.fire_counter = sprite.fire_counter_rate  # reset the counter
 
-
-
     def _process_events(self, event):
 
         # first, let's process the process of properly quitting pygame
@@ -166,7 +164,6 @@ class Game:
 
             pygame.quit()
             sys.exit()  # finally, let's kill everything that's left
-
 
     def _process_game_logic(self):
         # start with processing the simple physics
