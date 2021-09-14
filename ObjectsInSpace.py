@@ -98,7 +98,7 @@ class SpaceObject(Sprite):
     def rotate_retrograde(self):
         # this finds out the angle that the ship is tracking
         # then rotates 180 degrees in the opposite direction
-        track = degrees(atan2(-self.dy, self.dx))
+        track = degrees(self.get_track())
         reciprocal = track + 180
         if reciprocal > 360:
             reciprocal = reciprocal - 360
@@ -130,6 +130,54 @@ class SpaceObject(Sprite):
         dy = self.dy
         return atan2(-dy, dx)
 
+    def keys_to_control_inputs(self, sprite_list) -> None:
+        """
+        this method takes the keys being pressed by the user as a list and translates that
+        into sprite behavior.  It takes a sprite group that the game is working with
+        so you can populate bullet sprites into the group as you shoot
+
+        :param sprite_list: the sprite group to populate bullets into
+        :return:
+        """
+        keys = pygame.key.get_pressed()  # first get the pressed keys
+
+        if keys[pygame.K_LEFT]:
+            # rotate left
+            self.rotate_left()
+
+        if keys[pygame.K_RIGHT]:
+            # rotate right
+            self.rotate_right()
+
+        if keys[pygame.K_UP]:
+            self.accelerate()
+
+        if keys[pygame.K_DOWN]:
+            self.rotate_retrograde()
+
+        # now if neither the left or right keys, OR the down key is pressed...
+        # then stop rotation
+        any_rotation_key = not (keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_DOWN])
+        if any_rotation_key:
+            self.stop_rotation()
+
+        if keys[pygame.K_SPACE]:
+            if not self.firing:
+                # if you're not firing, go ahead and fire a laser
+                bullet = self.fire()
+                bullet.create_rotation_map()
+                sprite_list    .add(bullet)
+                self.firing = True  # now set firing to true
+
+            if self.firing:
+                # we need to count down until the next time you can fire
+                self.fire_counter -= 1
+
+            # now we need to handle the logic of the fire counter
+            if self.fire_counter <= 0:
+                self.firing = False  # the gun has cooled down
+                self.fire_counter = self.fire_counter_rate  # reset the counter
+
     def update(self):
         # this gets updated when you update a sprite or group of sprites
         # it's just part of the Pygame API
@@ -153,6 +201,9 @@ class SpaceObject(Sprite):
             # you could change this with DeMorgan's law... but this seems cleanest
             self.rect.centerx += self.dx
             self.rect.centery += self.dy
+
+        # process controls here
+
 
         if self.debug:
             print(self.rect, self.theta, self.dx, self.dy)

@@ -67,8 +67,12 @@ class Game:
             for event in pygame.event.get():
                 self._process_events(event)
 
-            # controls processes here
-            self._process_keyboard_controls()
+            # controls processes here:
+            # first process keyboard controls:
+            for sprite in [sprite for sprite in self.space_objects if sprite.is_controllable]:
+                # go through each key press that a controllable vehicle has and execute the command
+                sprite.keys_to_control_inputs(self.space_objects)
+
             self._process_network_controls()
 
             # networking to control game state here
@@ -107,49 +111,6 @@ class Game:
         """
         pass
 
-    def _process_keyboard_controls(self) -> None:
-        # control of the sprites works by turning activating the appropriate methods
-        keys = pygame.key.get_pressed()  # first get the pressed keys
-        controllables = [sprite for sprite in self.space_objects if sprite.is_controllable]
-        # a list of all the sprites that are player controllable
-        for sprite in controllables:
-            # go through each key press that a controllable vehicle has and execute the command
-            if keys[pygame.K_LEFT]:
-                # rotate left
-                sprite.rotate_left()
-
-            if keys[pygame.K_RIGHT]:
-                # rotate right
-                sprite.rotate_right()
-
-            if keys[pygame.K_UP]:
-                sprite.accelerate()
-
-            if keys[pygame.K_DOWN]:
-                sprite.rotate_retrograde()
-
-            # now if neither the left or right keys, OR the down key is pressed...
-            # then stop rotation
-            any_rotation_key = not (keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_DOWN])
-            if any_rotation_key:
-                sprite.stop_rotation()
-
-            if keys[pygame.K_SPACE]:
-                if not sprite.firing:
-                    # if you're not firing, go ahead and fire a laser
-                    bullet = sprite.fire()
-                    bullet.create_rotation_map()
-                    self.space_objects.add(bullet)
-                    sprite.firing = True  # now set firing to true
-
-                if sprite.firing:
-                    # we need to count down until the next time you can fire
-                    sprite.fire_counter -= 1
-
-                # now we need to handle the logic of the fire counter
-                if sprite.fire_counter <= 0:
-                    sprite.firing = False  # the gun has cooled down
-                    sprite.fire_counter = sprite.fire_counter_rate  # reset the counter
 
     def _process_events(self, event) -> None:
 
