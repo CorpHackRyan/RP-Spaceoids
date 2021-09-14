@@ -1,6 +1,6 @@
 import pygame.image
 from pygame.sprite import Sprite
-from math import atan2, radians, sin, cos, sqrt
+from math import atan2, radians, sin, cos, sqrt, degrees
 from random import choice
 
 
@@ -95,6 +95,18 @@ class SpaceObject(Sprite):
             self.dx = (new_dx / new_speed_vector_length) * self.max_speed
             self.dy = (new_dy / new_speed_vector_length) * self.max_speed
 
+    def rotate_retrograde(self):
+        # this finds out the angle that the ship is tracking
+        # then rotates 180 degrees in the opposite direction
+        track = degrees(atan2(-self.dy, self.dx))
+        reciprocal = track + 180
+        if reciprocal > 360:
+            reciprocal = reciprocal - 360
+
+        if reciprocal - self.theta <= 0:
+            self.rotate_right()
+        else:
+            self.rotate_left()
 
     def decelerate(self):
         # this works by getting the current angle theta from the heading of the ship
@@ -173,8 +185,8 @@ class Player(SpaceObject):
         # create a rectangle from the image
         self.rect = self.image.get_rect()
 
-        self.thruster_rate = 3
-        self.max_speed = 7
+        self.thruster_rate = 2
+        self.max_speed = 4
 
         pygame.sprite.Sprite.__init__(self)  # you have to do this to initialize the sprite
 

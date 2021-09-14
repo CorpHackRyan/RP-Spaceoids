@@ -110,7 +110,6 @@ class Game:
     def _process_keyboard_controls(self) -> None:
         # control of the sprites works by turning activating the appropriate methods
         keys = pygame.key.get_pressed()  # first get the pressed keys
-
         controllables = [sprite for sprite in self.space_objects if sprite.is_controllable]
         # a list of all the sprites that are player controllable
         for sprite in controllables:
@@ -127,10 +126,12 @@ class Game:
                 sprite.accelerate()
 
             if keys[pygame.K_DOWN]:
-                sprite.decelerate()
+                sprite.rotate_retrograde()
 
-            # now if neither the left or right keys are pressed, stop rotation
-            if (not keys[pygame.K_RIGHT]) and (not keys[pygame.K_LEFT]):
+            # now if neither the left or right keys, OR the down key is pressed...
+            # then stop rotation
+            any_rotation_key = not (keys[pygame.K_RIGHT] or keys[pygame.K_LEFT] or keys[pygame.K_DOWN])
+            if any_rotation_key:
                 sprite.stop_rotation()
 
             if keys[pygame.K_SPACE]:
@@ -150,7 +151,7 @@ class Game:
                     sprite.firing = False  # the gun has cooled down
                     sprite.fire_counter = sprite.fire_counter_rate  # reset the counter
 
-    def _process_events(self, event):
+    def _process_events(self, event) -> None:
 
         # first, let's process the process of properly quitting pygame
         if event.type == pygame.QUIT:
