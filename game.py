@@ -35,7 +35,7 @@ class Game:
         but for now, it's simple, self.alive controls the main while loop
         and score is the score!"""
         self.score = 0
-        self.alive = True
+        self.playing = True
         self.results = "Game Over"  # the main loop will return this variable when the game is complete
 
         # text default stuff below
@@ -61,7 +61,7 @@ class Game:
 
     def main_loop(self):
 
-        while self.alive:
+        while self.playing:
 
             # get all the events, and process every one
             for event in pygame.event.get():
@@ -204,7 +204,7 @@ class Game:
             # now we'll do player logic here
             if isinstance(obj, Player):
                 if obj.health <= 0:
-                    self.alive = False
+                    self.playing = False
                     self.results = (f"You have died.  Game Over.  Final Score: {self.score}", self.score)
 
                 # check to see if the player ship has collided with the rocks
@@ -232,7 +232,7 @@ class Game:
 
         # finally, we need to process the "winning" logic here
         if len(rock_group) == 0:
-            self.alive = False  # end the game loop
+            self.playing = False  # end the game loop
             self.results = (f"You have won.  Congratulations!  Final Score: {self.score}", self.score)
 
         # now delete all the stuff that should be deleted
