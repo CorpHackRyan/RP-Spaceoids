@@ -151,7 +151,7 @@ class Game:
         for obj in self.space_objects:
 
             """
-            let's warm the object back around if it goes outside the screen
+            let's warp the object back around if it goes outside the screen
             all this logic does is warp stuff to the opposite side of the screen
             if an object goes too far in one direction.  Effectively the geometry of
             this mini universe is toroidal"""
@@ -197,6 +197,7 @@ class Game:
 
                     delete_list.append(obj)
 
+                # if a bullet object collides with a rock object...
                 collide = pygame.sprite.spritecollide(obj, bullet_group, True, pygame.sprite.collide_mask)
                 if collide:
                     obj.health -= 10  # take away 10 HP if a laser hits a rock

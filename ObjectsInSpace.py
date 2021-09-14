@@ -166,7 +166,7 @@ class SpaceObject(Sprite):
                 # if you're not firing, go ahead and fire a laser
                 bullet = self.fire()
                 bullet.create_rotation_map()
-                sprite_list    .add(bullet)
+                sprite_list.add(bullet)
                 self.firing = True  # now set firing to true
 
             if self.firing:
@@ -181,7 +181,7 @@ class SpaceObject(Sprite):
     def update(self):
         # this gets updated when you update a sprite or group of sprites
         # it's just part of the Pygame API
-
+        
         # let's process rotation here
         # we want to keep the values of theta from becoming giant
         if self.dtheta != 0:
@@ -203,7 +203,6 @@ class SpaceObject(Sprite):
             self.rect.centery += self.dy
 
         # process controls here
-
 
         if self.debug:
             print(self.rect, self.theta, self.dx, self.dy)
